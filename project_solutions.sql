@@ -94,4 +94,5 @@ SELECT st.student_name, sc.school_name, MAX(st.GPA) as GPA
 FROM student as st
 	INNER JOIN school as sc on st.school_id = sc.school_id
 GROUP BY sc.school_id
-ORDER BY st.GPA DESC;
+ORDER BY st.GPA DESC 
+LIMIT 3;
