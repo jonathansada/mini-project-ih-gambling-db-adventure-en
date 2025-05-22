@@ -65,17 +65,16 @@ WHERE b.Product LIKE '%sportsbook%' AND b.bet_amt > 0
 GROUP BY c.CustId;
 
 -- Q10:
--- Assuming stanked money is the money beat - money won
-SELECT c.Title, c.FirstName, c.LastName, s.product, s.money_stanked
+SELECT c.Title, c.FirstName, c.LastName, s.product, MAX(s.total_bet) as money_stanked
 FROM Customer as c
 	INNER JOIN (
-		SELECT a.CustId, b.product, MIN(b.Bet_Amt - b.Win_Amt) as money_stanked
+		SELECT a.CustId, b.product, SUM(b.Bet_Amt) as total_bet
 		FROM Account as a
 			LEFT JOIN Betting as b ON a.AccountNo = b.AccountNo
-		GROUP BY a.CustId
-		ORDER BY money_stanked ASC) as s ON c.CustId = s.CustId
-GROUP BY c.CustId, s.product
-ORDER BY  s.money_stanked ASC;
+		GROUP BY a.CustId,  b.product
+	) as s ON c.CustId = s.CustId
+GROUP BY c.CustId
+ORDER BY money_stanked ASC;
 
 -- Q11:
 SELECT student_name, GPA 
