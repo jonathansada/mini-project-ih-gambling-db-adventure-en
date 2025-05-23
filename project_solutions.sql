@@ -48,7 +48,7 @@ FROM Customer as c
 GROUP BY c.CustId;
 
 -- Q8:
-SELECT c.Title, c.FirstName, c.LastName, COUNT(DISTINCT b.product) as NumProducts
+SELECT b.AccountNo, c.Title, c.FirstName, c.LastName, COUNT(DISTINCT b.product) as NumProducts
 FROM Customer as c 
 	INNER JOIN Account as a ON c.CustId = a.CustId
 	INNER JOIN Betting as b ON a.AccountNo = b.AccountNo
@@ -56,13 +56,27 @@ WHERE b.bet_amt > 0
 GROUP BY c.CustId
 ORDER BY NumProducts DESC;
 
+SELECT c.Title, c.FirstName, c.LastName, b.product
+FROM Customer c
+	JOIN Account a ON c.CustId = a.CustId
+	JOIN Betting b ON a.AccountNo = b.AccountNo
+WHERE b.bet_amt > 0
+  AND b.product IN ('Sportsbook', 'Vegas')
+GROUP BY a.AccountNo
+HAVING COUNT(DISTINCT b.product) = 2;
+
 -- Q9:
-SELECT c.Title, c.FirstName, c.LastName, SUM(b.bet_amt) as TotalBets
-FROM Customer as c 
-	INNER JOIN Account as a ON c.CustId = a.CustId
-	INNER JOIN Betting as b ON a.AccountNo = b.AccountNo
-WHERE b.Product LIKE '%sportsbook%' AND b.bet_amt > 0
-GROUP BY c.CustId;
+SELECT x.AccountNo ,x.Title, x.FirstName, x.LastName, x.amount 
+FROM (
+	SELECT a.AccountNo ,c.Title, c.FirstName, c.LastName, SUM(b.bet_amt) as amount, COUNT(DISTINCT b.product) as num, b.product
+	FROM Customer as c 
+		INNER JOIN Account as a ON c.CustId = a.CustId
+		RIGHT JOIN Betting as b ON a.AccountNo = b.AccountNo
+	WHERE b.bet_amt > 0	
+	GROUP BY c.CustId 
+	ORDER BY a.AccountNo
+) as x
+WHERE x.num = 1 AND x.product= 'Sportsbook';
 
 -- Q10:
 SELECT c.Title, c.FirstName, c.LastName, s.product, MAX(s.total_bet) as money_stanked
