@@ -90,9 +90,12 @@ GROUP BY sc.school_id
 ORDER BY students_num DESC;
 
 -- Q13:
-SELECT st.student_name, sc.school_name, MAX(st.GPA) as GPA 
-FROM student as st
-	INNER JOIN school as sc on st.school_id = sc.school_id
-GROUP BY sc.school_id
-ORDER BY st.GPA DESC 
-LIMIT 3;
+SELECT s.school_name, st.student_name, st.GPA
+FROM student st
+	JOIN school s ON st.school_id = s.school_id
+WHERE (
+    SELECT COUNT(*)
+    FROM student st2
+    WHERE st2.school_id = st.school_id AND st2.GPA > st.GPA
+) < 3
+ORDER BY s.school_name, st.GPA DESC;
